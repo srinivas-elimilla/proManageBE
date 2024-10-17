@@ -1,0 +1,43 @@
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+
+# Build output
+dist/
+build/
+
+# Dependency directories
+bower_components/
+
+# IDE and editor settings
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific files
+.DS_Store      # macOS
+Thumbs.db      # Windows
+
+# Coverage reports
+coverage/
+
+# Temporary files
+tmp/
+temp/
+
+# Configuration files
+*.tgz
+
+# Other files you may want to ignore
+*.swp         # Vim swap files
+*.lock         # Lock files if you're using a package manager that generates them
