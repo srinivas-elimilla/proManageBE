@@ -89,7 +89,7 @@ const update = async (req, res) => {
         name: user.name,
         email: user.email,
         message: "name updated successfully",
-        logout: true,
+        logout: false,
       });
     }
 
@@ -102,7 +102,7 @@ const update = async (req, res) => {
       await user.save();
       return res.status(200).json({
         message: "email updated successfully, please log in again.",
-        logout: true,
+        logout: false,
       });
     }
 
