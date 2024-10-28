@@ -99,65 +99,51 @@ const getTasks = async (req, res) => {
 
 const getTaskAnalytics = async (req, res) => {
   try {
-    const analytics = await Task.aggregate([
-      {
-        $facet: {
-          backlogCount: [
-            { $match: { category: "backlog" } },
-            { $count: "count" },
-          ],
-          doneCount: [{ $match: { category: "done" } }, { $count: "count" }],
-          progressCount: [
-            { $match: { category: "progress" } },
-            { $count: "count" },
-          ],
-          todoCount: [{ $match: { category: "todo" } }, { $count: "count" }],
-          highPriorityCount: [
-            { $match: { priority: "high" } },
-            { $count: "count" },
-          ],
-          moderatePriorityCount: [
-            { $match: { priority: "moderate" } },
-            { $count: "count" },
-          ],
-          lowPriorityCount: [
-            { $match: { priority: "low" } },
-            { $count: "count" },
-          ],
-          dueDateCount: [
-            { $match: { dueDate: { $ne: null } } },
-            { $count: "count" },
-          ],
-        },
-      },
-      {
-        $project: {
-          backlogCount: { $arrayElemAt: ["$backlogCount.count", 0] },
-          doneCount: { $arrayElemAt: ["$doneCount.count", 0] },
-          progressCount: { $arrayElemAt: ["$progressCount.count", 0] },
-          todoCount: { $arrayElemAt: ["$todoCount.count", 0] },
-          highPriorityCount: { $arrayElemAt: ["$highPriorityCount.count", 0] },
-          moderatePriorityCount: {
-            $arrayElemAt: ["$moderatePriorityCount.count", 0],
-          },
-          lowPriorityCount: { $arrayElemAt: ["$lowPriorityCount.count", 0] },
-          dueDateCount: { $arrayElemAt: ["$dueDateCount.count", 0] },
-        },
-      },
-    ]);
+    const filterQuery = {
+      $or: [{ createdBy: req.user.email }, { assignedTo: req.user.email }],
+    };
+
+    const tasks = await Task.find(filterQuery);
+
+    const analytics = {
+      backlogCount: 0,
+      doneCount: 0,
+      progressCount: 0,
+      todoCount: 0,
+      highPriorityCount: 0,
+      moderatePriorityCount: 0,
+      lowPriorityCount: 0,
+      dueDateCount: 0,
+    };
+
+    analytics.backlogCount = tasks.filter(
+      (task) => task.category === "backlog"
+    ).length;
+    analytics.doneCount = tasks.filter(
+      (task) => task.category === "done"
+    ).length;
+    analytics.progressCount = tasks.filter(
+      (task) => task.category === "progress"
+    ).length;
+    analytics.todoCount = tasks.filter(
+      (task) => task.category === "todo"
+    ).length;
+    analytics.highPriorityCount = tasks.filter(
+      (task) => task.priority === "high"
+    ).length;
+    analytics.moderatePriorityCount = tasks.filter(
+      (task) => task.priority === "moderate"
+    ).length;
+    analytics.lowPriorityCount = tasks.filter(
+      (task) => task.priority === "low"
+    ).length;
+    analytics.dueDateCount = tasks.filter(
+      (task) => task.dueDate !== null
+    ).length;
 
     res.json({
       message: "analytics fetched",
-      analytics: analytics[0] || {
-        backlogCount: 0,
-        doneCount: 0,
-        progressCount: 0,
-        todoCount: 0,
-        highPriorityCount: 0,
-        moderatePriorityCount: 0,
-        lowPriorityCount: 0,
-        dueDateCount: 0,
-      },
+      analytics,
       error: false,
     });
   } catch (error) {
