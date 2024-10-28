@@ -73,20 +73,25 @@ const getTasks = async (req, res) => {
       endTime = null;
   }
 
-  let filterQuery = {
+  const filterQuery = {
     $or: [{ createdBy: req.user.email }, { assignedTo: req.user.email }],
   };
 
-  if (endTime) {
-    filterQuery.$or = [
-      { dueDate: null },
-      { dueDate: { $gte: now, $lt: endTime } },
-    ];
-  }
-
   try {
     const tasks = await Task.find(filterQuery);
-    res.status(200).json(tasks);
+    console.log(tasks.length);
+
+    const filteredTasks = tasks.filter((task) => {
+      if (endTime) {
+        return (
+          task.dueDate === null ||
+          (task.dueDate >= now && task.dueDate < endTime)
+        );
+      }
+      return true;
+    });
+
+    res.status(200).json(filteredTasks);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
