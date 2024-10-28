@@ -11,14 +11,12 @@ const createTask = async (req, res) => {
     sharedWith,
   } = req.body;
 
-  // console.log(req.user);
-
   try {
     const task = new Task({
       title,
       checklist,
       priority,
-      dueDate,
+      dueDate: dueDate ? new Date(dueDate).getTime() : null,
       category,
       createdBy: req.user.email,
       assignedTo,
@@ -58,28 +56,33 @@ const deleteTask = async (req, res) => {
 
 const getTasks = async (req, res) => {
   const { filter } = req.query;
-  const now = new Date();
+  const now = Date.now();
+  let endTime;
+
+  switch (filter) {
+    case "today":
+      endTime = now + 24 * 60 * 60 * 1000;
+      break;
+    case "week":
+      endTime = now + 7 * 24 * 60 * 60 * 1000;
+      break;
+    case "month":
+      endTime = now + 30 * 24 * 60 * 60 * 1000;
+      break;
+    default:
+      endTime = null;
+  }
+
   let filterQuery = {
     $or: [{ createdBy: req.user.email }, { assignedTo: req.user.email }],
   };
 
-  if (filter === "today") {
-    filterQuery.dueDate = {
-      $gte: now,
-      $lt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
-    };
-  } else if (filter === "week") {
-    filterQuery.dueDate = {
-      $gte: now,
-      $lt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
-    };
-  } else if (filter === "month") {
-    filterQuery.dueDate = {
-      $gte: now,
-      $lt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
-    };
+  if (endTime) {
+    filterQuery.$or = [
+      { dueDate: null },
+      { dueDate: { $gte: now, $lt: endTime } },
+    ];
   }
-  console.log(filterQuery);
 
   try {
     const tasks = await Task.find(filterQuery);
@@ -159,10 +162,24 @@ const getTaskAnalytics = async (req, res) => {
   }
 };
 
+const getTaskById = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({ message: "task not found" });
+    }
+    res.json(task);
+  } catch (error) {
+    res.status(500).json({ message: "server error" });
+  }
+};
+
 module.exports = {
   createTask,
   updateTask,
   deleteTask,
   getTasks,
   getTaskAnalytics,
+  getTaskById,
 };

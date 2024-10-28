@@ -6,13 +6,15 @@ const {
   deleteTask,
   getTasks,
   getTaskAnalytics,
+  getTaskById,
 } = require("../controllers/task.controller");
-const checkAccess = require("../middlewares/check.middleware");
+const checkAuth = require("../middlewares/check.middleware");
 
-router.post("/create", checkAccess, createTask);
-router.put("/:taskId", checkAccess, updateTask);
-router.delete("/:taskId", checkAccess, deleteTask);
-router.get("/all", checkAccess, getTasks);
-router.get("/analytics", checkAccess, getTaskAnalytics);
+router.post("/create", checkAuth, createTask);
+router.put("/:taskId", checkAuth, updateTask);
+router.delete("/:taskId", checkAuth, deleteTask);
+router.get("/all", checkAuth, getTasks);
+router.get("/analytics", checkAuth, getTaskAnalytics);
+router.get("/:taskId", checkAuth, getTaskById);
 
 module.exports = router;

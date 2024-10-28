@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 
-const checkAccess = async (req, res, next) => {
+const checkAuth = async (req, res, next) => {
   let token;
 
   if (
@@ -24,4 +24,4 @@ const checkAccess = async (req, res, next) => {
   }
 };
 
-module.exports = checkAccess;
+module.exports = checkAuth;
