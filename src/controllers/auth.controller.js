@@ -60,6 +60,48 @@ const login = async (req, res) => {
   }
 };
 
+const getUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "user not found" });
+    }
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      message: "fetched user",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "server error" });
+  }
+};
+
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ message: "no users found" });
+    }
+
+    const formattedUsers = users.map((user) => ({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    }));
+
+    res.json({
+      message: "users fetched",
+      users: formattedUsers,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "server error" });
+  }
+};
+
 const update = async (req, res) => {
   const { name, email, oldPassword, newPassword } = req.body;
 
@@ -127,4 +169,4 @@ const update = async (req, res) => {
   }
 };
 
-module.exports = { register, login, update };
+module.exports = { register, login, getUser, update, getUsers };

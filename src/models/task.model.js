@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const checklistSchema = new mongoose.Schema({
   text: { type: String, required: true },
-  checked: { type: Boolean, default: false },
+  isChecked: { type: Boolean, default: false },
 });
 
 const taskSchema = new mongoose.Schema(
@@ -14,6 +14,7 @@ const taskSchema = new mongoose.Schema(
     category: {
       type: String,
       default: "todo",
+      enum: ["todo", "backlog", "progress", "done"],
     },
     createdBy: { type: String },
     assignedTo: { type: String },
