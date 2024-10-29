@@ -15,6 +15,6 @@ router.put("/:taskId", checkAuth, updateTask);
 router.delete("/:taskId", checkAuth, deleteTask);
 router.get("/all", checkAuth, getTasks);
 router.get("/analytics", checkAuth, getTaskAnalytics);
-router.get("/:taskId", checkAuth, getTaskById);
+router.get("/:taskId", getTaskById);
 
 module.exports = router;
